@@ -2,6 +2,11 @@
 name = "inventory"
 version = "0.0.0"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
+license = "MIT/Apache-2.0"
+description = "Typed distributed plugin registration"
+repository = "https://github.com/dtolnay/inventory"
+documentation = "https://docs.rs/inventory"
+readme = "README.md"
 edition = "2018"
 
 [dependencies]
