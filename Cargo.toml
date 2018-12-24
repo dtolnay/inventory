@@ -1,0 +1,13 @@
+[package]
+name = "inventory"
+version = "0.0.0"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ctor = "0.1"
+ghost = "0.1"
+inventory-impl = { version = "0.0", path = "impl" }
+
+[workspace]
+members = ["impl"]
