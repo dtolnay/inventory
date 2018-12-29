@@ -32,7 +32,7 @@ pub fn submit(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             //         VALUE = Some(inventory::Node {
             //             value: value(),
             //             next: None,
-            //         };
+            //         });
             //         inventory::submit(VALUE.as_mut().unwrap());
             //     }
 
