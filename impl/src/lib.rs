@@ -49,6 +49,7 @@ pub fn submit(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     };
 
     let expanded = quote! {
+        #[allow(non_upper_case_globals)]
         #[#prefix inventory::ctor]
         fn #init() {
             // TODO: once existential type is stable, store the caller's
