@@ -15,6 +15,8 @@ inventory = "0.1"
 
 *Supports rustc 1.31+*
 
+<br>
+
 # Examples
 
 Suppose we are writing a command line flags library and want to allow any source
@@ -84,6 +86,20 @@ for flag in inventory::iter::<Flag> {
 
 There is no guarantee about the order that plugins of the same type are visited
 by the iterator. They may be visited in any order.
+
+<br>
+
+## How it works
+
+Inventory is built on the [`ctor`] crate which provides module initialization
+functions for Rust similar to `__attribute__((constructor))` in C. Each call to
+`inventory::submit!` produces a shim that evaluates the given expression and
+registers it into a registry of its corresponding type. This registration
+happens dynamically as part of life-before-main for statically linked elements.
+Elements brought in by a dynamically loaded library are registered at the time
+that dlopen occurs.
+
+[`ctor`]: https://github.com/mmastrac/rust-ctor
 
 <br>
 
