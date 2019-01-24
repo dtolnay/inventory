@@ -153,11 +153,11 @@ impl<T: 'static> Registry<T> {
     }
 }
 
+#[allow(non_camel_case_types)]
 mod private {
     use ghost::phantom;
 
     #[phantom]
-    #[allow(non_camel_case_types)]
     pub struct iter<T>;
 }
 
