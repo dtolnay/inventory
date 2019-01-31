@@ -116,9 +116,22 @@ struct Node<T: 'static> {
     next: Option<&'static Node<T>>,
 }
 
-// Not public API. Used by generated code.
-#[doc(hidden)]
+/// Trait bound corresponding to types that can be iterated by inventory::iter.
+///
+/// This trait cannot be implemented manually. Instead use the [`collect`] macro
+/// which expands to an implementation of this trait for the given type.
+///
+/// # Examples
+///
+/// ```
+/// use inventory::Collect;
+///
+/// fn count_plugins<T: Collect>() -> usize {
+///     inventory::iter::<T>.into_iter().count()
+/// }
+/// ```
 pub trait Collect: Sized + 'static {
+    #[doc(hidden)]
     fn registry() -> &'static Registry<Self>;
 }
 
