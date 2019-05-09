@@ -2,7 +2,7 @@
 name = "inventory-impl"
 version = "0.1.3"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 description = "Implementation of macros for the `inventory` crate"
 repository = "https://github.com/dtolnay/inventory"
 edition = "2018"
