@@ -11,7 +11,7 @@ edition = "2018"
 
 [dependencies]
 ctor = "0.1"
-ghost = "0.1"
+ghost = "0.1.1"
 inventory-impl = { version = "=0.1.4", path = "impl" }
 
 [workspace]
