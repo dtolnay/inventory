@@ -9,6 +9,9 @@ documentation = "https://docs.rs/inventory"
 readme = "README.md"
 edition = "2018"
 
+[badges]
+travis-ci = { repository = "dtolnay/inventory" }
+
 [dependencies]
 ctor = "0.1"
 ghost = "0.1.1"
