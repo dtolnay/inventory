@@ -152,13 +152,13 @@ impl<T: 'static> Registry<T> {
     }
 
     fn submit(&'static self, new: Box<Node<T>>) {
-        let new = Box::leak(new);
-
+        let mut new = ptr::NonNull::from(Box::leak(new));
         let mut head = self.head.load(Ordering::SeqCst);
         loop {
-            // Pointer is always null or valid &'static Node<T>.
-            new.next = unsafe { head.as_ref() };
-            let prev = self.head.compare_and_swap(head, new, Ordering::SeqCst);
+            // `new` is always a valid Node<T>, and is not yet visible through the registry.
+            // `head` is always null or valid &'static Node<T>.
+            unsafe { new.as_mut().next = head.as_ref() };
+            let prev = self.head.compare_and_swap(head, new.as_ptr(), Ordering::SeqCst);
             if prev == head {
                 return;
             } else {
