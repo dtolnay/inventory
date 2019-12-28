@@ -140,7 +140,7 @@ pub trait Collect: Sized + 'static {
 pub fn submit<T: Collect>(value: T) {
     // TODO: Avoid allocation by storing node in a static mut Option<Node<T>>
     // after existential type is stable. See comment in inventory-impl.
-    T::registry().submit(Box::leak(Box::new(Node { value, next: None })));
+    T::registry().submit(Box::new(Node { value, next: None }));
 }
 
 impl<T: 'static> Registry<T> {
@@ -151,13 +151,15 @@ impl<T: 'static> Registry<T> {
         }
     }
 
-    fn submit(&'static self, new: &'static mut Node<T>) {
+    fn submit(&'static self, new: Box<Node<T>>) {
+        let mut new = ptr::NonNull::from(Box::leak(new));
         let mut head = self.head.load(Ordering::SeqCst);
         loop {
-            let prev = self.head.compare_and_swap(head, new, Ordering::SeqCst);
+            // `new` is always a valid Node<T>, and is not yet visible through the registry.
+            // `head` is always null or valid &'static Node<T>.
+            unsafe { new.as_mut().next = head.as_ref() };
+            let prev = self.head.compare_and_swap(head, new.as_ptr(), Ordering::SeqCst);
             if prev == head {
-                // Pointer is always null or valid &'static Node<T>.
-                new.next = unsafe { prev.as_ref() };
                 return;
             } else {
                 head = prev;
