@@ -1,6 +1,6 @@
 [package]
 name = "inventory"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Typed distributed plugin registration"
@@ -15,7 +15,7 @@ travis-ci = { repository = "dtolnay/inventory" }
 [dependencies]
 ctor = "0.1"
 ghost = "0.1.1"
-inventory-impl = { version = "=0.1.4", path = "impl" }
+inventory-impl = { version = "=0.1.5", path = "impl" }
 
 [workspace]
 members = ["impl"]
