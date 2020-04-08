@@ -1,4 +1,3 @@
-#![no_std]
 //! **Typed distributed plugin registration.**
 //!
 //! This crate provides a way to set up a plugin registry into which plugins
@@ -95,7 +94,11 @@
 //! There is no guarantee about the order that plugins of the same type are
 //! visited by the iterator. They may be visited in any order.
 
+#![cfg_attr(not(inventory_require_std), no_std)]
+
+#[cfg(not(inventory_require_std))]
 extern crate alloc;
+#[cfg(not(inventory_require_std))]
 use alloc::boxed::Box;
 
 // Not public API.
