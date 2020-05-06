@@ -1,6 +1,6 @@
 ## Typed distributed plugin registration
 
-[![Build Status](https://api.travis-ci.org/dtolnay/inventory.svg?branch=master)](https://travis-ci.org/dtolnay/inventory)
+[![Build Status](https://img.shields.io/github/workflow/status/dtolnay/inventory/CI/master)](https://github.com/dtolnay/inventory/actions?query=branch%3Amaster)
 [![Latest Version](https://img.shields.io/crates/v/inventory.svg)](https://crates.io/crates/inventory)
 [![Rust Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/inventory)
 
