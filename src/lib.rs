@@ -117,6 +117,7 @@ pub use ctor::ctor;
 #[doc(hidden)]
 pub use inventory_impl as r#impl;
 
+use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
 
@@ -229,16 +230,28 @@ pub type iter<T> = private::iter<T>;
 pub use crate::private::*;
 
 const ITER: () = {
+    fn into_iter<T: Collect>() -> Iter<T> {
+        let head = T::registry().head.load(Ordering::SeqCst);
+        Iter {
+            // Head pointer is always null or valid &'static Node<T>.
+            node: unsafe { head.as_ref() },
+        }
+    }
+
     impl<T: Collect> IntoIterator for iter<T> {
         type Item = &'static T;
         type IntoIter = Iter<T>;
 
         fn into_iter(self) -> Self::IntoIter {
-            let head = T::registry().head.load(Ordering::SeqCst);
-            Iter {
-                // Head pointer is always null or valid &'static Node<T>.
-                node: unsafe { head.as_ref() },
-            }
+            into_iter()
+        }
+    }
+
+    #[doc(hidden)]
+    impl<T: Collect> Deref for iter<T> {
+        type Target = fn() -> Iter<T>;
+        fn deref(&self) -> &Self::Target {
+            &(into_iter as fn() -> Iter<T>)
         }
     }
 
