@@ -6,10 +6,10 @@ use std::hash::Hasher;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
-use syn::{bracketed, parse_macro_input, Token};
+use syn::{bracketed, parse_macro_input, Token, Path};
 
 struct Input {
-    krate: Option<Ident>,
+    krate: Option<Path>,
     expr: TokenStream,
 }
 
@@ -25,7 +25,7 @@ impl Parse for Input {
                     bracketed!(content in input);
                     content.parse::<Token![crate]>()?;
                     content.parse::<Token![=]>()?;
-                    let krate: Ident = content.parse()?;
+                    let krate = content.parse()?;
                     Some(krate)
                 } else {
                     None
