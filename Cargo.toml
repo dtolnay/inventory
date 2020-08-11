@@ -1,6 +1,6 @@
 [package]
 name = "inventory"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Typed distributed plugin registration"
@@ -12,7 +12,7 @@ edition = "2018"
 [dependencies]
 ctor = "0.1"
 ghost = "0.1.1"
-inventory-impl = { version = "=0.1.7", path = "impl" }
+inventory-impl = { version = "=0.1.8", path = "impl" }
 
 [workspace]
 members = ["impl"]
