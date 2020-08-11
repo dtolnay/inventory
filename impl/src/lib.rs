@@ -6,7 +6,7 @@ use std::hash::Hasher;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
-use syn::{bracketed, parse_macro_input, Token, Path};
+use syn::{bracketed, parse_macro_input, Path, Token};
 
 struct Input {
     krate: Option<Path>,
