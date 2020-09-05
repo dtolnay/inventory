@@ -257,6 +257,7 @@ const ITER: () = {
         }
     }
 
+    #[derive(Clone)]
     pub struct Iter<T: 'static> {
         node: Option<&'static Node<T>>,
     }
