@@ -175,13 +175,12 @@ impl<T: 'static> Registry<T> {
             // `new` is always a valid Node<T>, and is not yet visible through the registry.
             // `head` is always null or valid &'static Node<T>.
             unsafe { new.as_mut().next = head.as_ref() };
-            let prev = self
+            match self
                 .head
-                .compare_and_swap(head, new.as_ptr(), Ordering::SeqCst);
-            if prev == head {
-                return;
-            } else {
-                head = prev;
+                .compare_exchange(head, new.as_ptr(), Ordering::SeqCst, Ordering::SeqCst)
+            {
+                Ok(_) => return,
+                Err(prev) => head = prev,
             }
         }
     }
