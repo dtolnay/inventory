@@ -104,6 +104,13 @@
 
 #![doc(html_root_url = "https://docs.rs/inventory/0.1.10")]
 #![cfg_attr(not(inventory_require_std), no_std)]
+#![allow(
+    clippy::doc_markdown,
+    clippy::empty_enum,
+    clippy::expl_impl_clone_on_copy,
+    clippy::let_unit_value,
+    clippy::must_use_candidate
+)]
 
 #[cfg(not(inventory_require_std))]
 extern crate alloc;
