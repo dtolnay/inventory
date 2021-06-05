@@ -109,7 +109,8 @@
     clippy::empty_enum,
     clippy::expl_impl_clone_on_copy,
     clippy::let_unit_value,
-    clippy::must_use_candidate
+    clippy::must_use_candidate,
+    clippy::semicolon_if_nothing_returned, // https://github.com/rust-lang/rust-clippy/issues/7324
 )]
 
 #[cfg(not(inventory_require_std))]
