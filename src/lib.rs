@@ -126,6 +126,8 @@ pub use ctor::ctor;
 #[doc(hidden)]
 pub use inventory_impl as r#impl;
 
+use core::cell::UnsafeCell;
+use core::mem::MaybeUninit;
 use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
@@ -136,9 +138,35 @@ pub struct Registry<T: 'static> {
     head: AtomicPtr<Node<T>>,
 }
 
-struct Node<T: 'static> {
+#[doc(hidden)]
+pub struct Node<T: 'static> {
     value: T,
-    next: Option<&'static Node<T>>,
+    next: *mut Node<T>,
+}
+
+impl<T: 'static> Node<T> {
+    pub fn new(value: T) -> Self {
+        Self {
+            value,
+            next: ptr::null_mut(),
+        }
+    }
+}
+
+#[doc(hidden)]
+pub struct StaticNode<T: 'static>(UnsafeCell<MaybeUninit<Node<T>>>);
+
+unsafe impl<T: 'static> Send for StaticNode<T> {}
+unsafe impl<T: 'static> Sync for StaticNode<T> {}
+
+impl<T: 'static> StaticNode<T> {
+    pub const unsafe fn new() -> Self {
+        Self(UnsafeCell::new(MaybeUninit::uninit()))
+    }
+
+    pub fn get(&self) -> *mut Node<T> {
+        self.0.get() as *mut _
+    }
 }
 
 /// Trait bound corresponding to types that can be iterated by inventory::iter.
@@ -165,7 +193,17 @@ pub trait Collect: Sized + 'static {
 pub fn submit<T: Collect>(value: T) {
     // TODO: Avoid allocation by storing node in a static mut Option<Node<T>>
     // after existential type is stable. See comment in inventory-impl.
-    T::registry().submit(Box::new(Node { value, next: None }));
+    let node = Box::leak(Box::new(Node::new(value)));
+    unsafe {
+        T::registry().submit_raw(node);
+    }
+}
+
+// Not public API. Used by generated code.
+#[doc(hidden)]
+#[inline]
+pub unsafe fn submit_raw<T: Collect>(node: *mut Node<T>) {
+    T::registry().submit_raw(node);
 }
 
 impl<T: 'static> Registry<T> {
@@ -176,16 +214,16 @@ impl<T: 'static> Registry<T> {
         }
     }
 
-    fn submit(&'static self, new: Box<Node<T>>) {
-        let mut new = ptr::NonNull::from(Box::leak(new));
+    unsafe fn submit_raw(&'static self, new: *mut Node<T>) {
         let mut head = self.head.load(Ordering::SeqCst);
+        let new_next_ptr = ptr::addr_of_mut!((*new).next);
         loop {
             // `new` is always a valid Node<T>, and is not yet visible through the registry.
-            // `head` is always null or valid &'static Node<T>.
-            unsafe { new.as_mut().next = head.as_ref() };
+            // `head` is always null or valid *mut Node<T>.
+            ptr::write(new_next_ptr, head);
             match self
                 .head
-                .compare_exchange(head, new.as_ptr(), Ordering::SeqCst, Ordering::SeqCst)
+                .compare_exchange(head, new, Ordering::SeqCst, Ordering::SeqCst)
             {
                 Ok(_) => return,
                 Err(prev) => head = prev,
@@ -243,8 +281,8 @@ const ITER: () = {
     fn into_iter<T: Collect>() -> Iter<T> {
         let head = T::registry().head.load(Ordering::SeqCst);
         Iter {
-            // Head pointer is always null or valid &'static Node<T>.
-            node: unsafe { head.as_ref() },
+            // Head pointer is always null or valid *mut Node<T>.
+            node: head,
         }
     }
 
@@ -267,17 +305,21 @@ const ITER: () = {
 
     #[derive(Clone)]
     pub struct Iter<T: 'static> {
-        node: Option<&'static Node<T>>,
+        node: *mut Node<T>,
     }
 
     impl<T: 'static> Iterator for Iter<T> {
         type Item = &'static T;
 
         fn next(&mut self) -> Option<Self::Item> {
-            let node = self.node?;
-            let value = &node.value;
-            self.node = node.next;
-            Some(value)
+            if self.node.is_null() {
+                None
+            } else {
+                let node = unsafe { &*self.node };
+                let value = &node.value;
+                self.node = node.next;
+                Some(value)
+            }
         }
     }
 };
@@ -369,6 +411,31 @@ macro_rules! collect {
 ///         }
 ///     }
 /// }
+/// ```
+///
+/// Specify the type to avoid allocation:
+///
+/// ```
+/// # #[derive(Debug, PartialEq)]
+/// # struct Flag { short: char, name: &'static str };
+/// #
+/// # impl Flag {
+/// #     fn new(short: char, name: &'static str) -> Self {
+/// #         Self { short, name }
+/// #     }
+/// # }
+/// #
+/// # inventory::collect!(Flag);
+/// #
+/// inventory::submit! {
+///     #![type = Flag]
+///     Flag::new('v', "verbose")
+/// }
+///
+/// let mut iter = inventory::iter::<Flag>.into_iter();
+/// assert_eq!(iter.next(), Some(&Flag::new('v', "verbose")));
+/// assert_eq!(iter.next(), None);
+///
 /// ```
 ///
 /// Refer to the [crate level documentation](index.html) for a complete example
