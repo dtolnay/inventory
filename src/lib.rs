@@ -119,10 +119,6 @@ extern crate alloc;
 #[doc(hidden)]
 pub use ctor::ctor;
 
-// Not public API.
-#[doc(hidden)]
-pub use inventory_impl as r#impl;
-
 use alloc::boxed::Box;
 use core::ops::Deref;
 use core::ptr;
@@ -374,9 +370,33 @@ macro_rules! collect {
 #[macro_export]
 macro_rules! submit {
     ($($value:tt)*) => {
-        $crate::r#impl::submit! {
-            $($value)*
-        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            #[$crate::ctor]
+            fn __init() {
+                // TODO: once existential type is stable, store the caller's
+                // expression into a static and string those statics together
+                // into an intrusive linked list without needing allocation.
+                //
+                //     existential type This;
+                //
+                //     static mut VALUE: Option<inventory::Node<This>> = None;
+                //
+                //     fn value() -> This {
+                //         $($value)*
+                //     }
+                //
+                //     unsafe {
+                //         VALUE = Some(inventory::Node {
+                //             value: value(),
+                //             next: None,
+                //         });
+                //         inventory::submit(VALUE.as_mut().unwrap());
+                //     }
+
+                $crate::submit({ $($value)* });
+            }
+        };
     }
 }
 

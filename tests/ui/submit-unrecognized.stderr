@@ -9,4 +9,4 @@ note: required by a bound in `submit`
     |
     | pub fn submit<T: Collect>(value: T) {
     |                  ^^^^^^^ required by this bound in `submit`
-    = note: this error originates in the macro `$crate::impl::submit` (in Nightly builds, run with -Z macro-backtrace for more info)
+    = note: this error originates in the macro `inventory::submit` (in Nightly builds, run with -Z macro-backtrace for more info)

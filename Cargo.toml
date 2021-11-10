@@ -13,14 +13,10 @@ rust-version = "1.31"
 [dependencies]
 ctor = "0.1"
 ghost = "0.1.1"
-inventory-impl = { version = "=0.1.11", path = "impl" }
 
 [dev-dependencies]
 rustversion = "1.0"
 trybuild = "1.0"
-
-[workspace]
-members = ["impl"]
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
