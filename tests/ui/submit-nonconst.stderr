@@ -1,0 +1,5 @@
+error[E0015]: calls in statics are limited to constant functions, tuple structs and tuple variants
+  --> tests/ui/submit-nonconst.rs:11:20
+   |
+11 | inventory::submit!(Thing::new());
+   |                    ^^^^^^^^^^^^
