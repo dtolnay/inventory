@@ -149,7 +149,7 @@ struct Node<T: 'static> {
 ///     inventory::iter::<T>.into_iter().count()
 /// }
 /// ```
-pub trait Collect: Sized + 'static {
+pub trait Collect: Sync + Sized + 'static {
     #[doc(hidden)]
     fn registry() -> &'static Registry<Self>;
 }
