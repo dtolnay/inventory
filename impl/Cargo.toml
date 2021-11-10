@@ -1,6 +1,6 @@
 [package]
 name = "inventory-impl"
-version = "0.1.10"
+version = "0.1.11"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Implementation of macros for the `inventory` crate"

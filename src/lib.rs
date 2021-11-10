@@ -102,7 +102,7 @@
 //! There is no guarantee about the order that plugins of the same type are
 //! visited by the iterator. They may be visited in any order.
 
-#![doc(html_root_url = "https://docs.rs/inventory/0.1.10")]
+#![doc(html_root_url = "https://docs.rs/inventory/0.1.11")]
 #![cfg_attr(not(inventory_require_std), no_std)]
 #![allow(
     clippy::doc_markdown,

@@ -1,6 +1,6 @@
 [package]
 name = "inventory"
-version = "0.1.10" # remember to update html_root_url
+version = "0.1.11" # remember to update html_root_url
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Typed distributed plugin registration"
@@ -13,7 +13,7 @@ rust-version = "1.31"
 [dependencies]
 ctor = "0.1"
 ghost = "0.1.1"
-inventory-impl = { version = "=0.1.10", path = "impl" }
+inventory-impl = { version = "=0.1.11", path = "impl" }
 
 [workspace]
 members = ["impl"]
