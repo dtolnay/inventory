@@ -61,7 +61,7 @@
 //! # struct Flag;
 //! #
 //! # impl Flag {
-//! #     fn new(short: char, name: &'static str) -> Self {
+//! #     const fn new(short: char, name: &'static str) -> Self {
 //! #         Flag
 //! #     }
 //! # }
@@ -113,26 +113,48 @@
     clippy::semicolon_if_nothing_returned, // https://github.com/rust-lang/rust-clippy/issues/7324
 )]
 
-extern crate alloc;
+// Not public API.
+#[doc(hidden)]
+pub extern crate core;
 
 // Not public API.
 #[doc(hidden)]
 pub use ctor::ctor;
 
-use alloc::boxed::Box;
+use core::cell::UnsafeCell;
+use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
 
 // Not public API. Used by generated code.
 #[doc(hidden)]
-pub struct Registry<T: 'static> {
-    head: AtomicPtr<Node<T>>,
+pub struct Registry {
+    head: AtomicPtr<Node>,
 }
 
-struct Node<T: 'static> {
-    value: T,
-    next: Option<&'static Node<T>>,
+// Not public API. Used by generated code.
+#[doc(hidden)]
+pub struct Node {
+    pub value: &'static dyn ErasedNode,
+    pub next: UnsafeCell<Option<&'static Node>>,
+}
+
+// The `value` is Sync, and `next` is only mutated during submit, which is prior
+// to any reads.
+unsafe impl Sync for Node {}
+
+// Not public API. Used by generated code.
+#[doc(hidden)]
+pub trait ErasedNode: Sync {
+    // SAFETY: requires *node.value is of type Self.
+    unsafe fn submit(&self, node: &'static Node);
+}
+
+impl<T: Collect> ErasedNode for T {
+    unsafe fn submit(&self, node: &'static Node) {
+        T::registry().submit(node);
+    }
 }
 
 /// Trait bound corresponding to types that can be iterated by inventory::iter.
@@ -151,18 +173,10 @@ struct Node<T: 'static> {
 /// ```
 pub trait Collect: Sync + Sized + 'static {
     #[doc(hidden)]
-    fn registry() -> &'static Registry<Self>;
+    fn registry() -> &'static Registry;
 }
 
-// Not public API. Used by generated code.
-#[doc(hidden)]
-pub fn submit<T: Collect>(value: T) {
-    // TODO: Avoid allocation by storing node in a static mut Option<Node<T>>
-    // after existential type is stable. See comment in inventory-impl.
-    T::registry().submit(Box::new(Node { value, next: None }));
-}
-
-impl<T: 'static> Registry<T> {
+impl Registry {
     // Not public API. Used by generated code.
     pub const fn new() -> Self {
         Registry {
@@ -170,16 +184,16 @@ impl<T: 'static> Registry<T> {
         }
     }
 
-    fn submit(&'static self, new: Box<Node<T>>) {
-        let mut new = ptr::NonNull::from(Box::leak(new));
+    // SAFETY: requires type of *new.value matches the $ty surrounding the
+    // declaration of this registry in inventory::collect macro.
+    unsafe fn submit(&'static self, new: &'static Node) {
         let mut head = self.head.load(Ordering::SeqCst);
         loop {
-            // `new` is always a valid Node<T>, and is not yet visible through the registry.
-            // `head` is always null or valid &'static Node<T>.
-            unsafe { new.as_mut().next = head.as_ref() };
+            *new.next.get() = head.as_ref();
+            let new_ptr = new as *const Node as *mut Node;
             match self
                 .head
-                .compare_exchange(head, new.as_ptr(), Ordering::SeqCst, Ordering::SeqCst)
+                .compare_exchange(head, new_ptr, Ordering::SeqCst, Ordering::SeqCst)
             {
                 Ok(_) => return,
                 Err(prev) => head = prev,
@@ -237,8 +251,9 @@ const ITER: () = {
     fn into_iter<T: Collect>() -> Iter<T> {
         let head = T::registry().head.load(Ordering::SeqCst);
         Iter {
-            // Head pointer is always null or valid &'static Node<T>.
+            // Head pointer is always null or valid &'static Node.
             node: unsafe { head.as_ref() },
+            marker: PhantomData,
         }
     }
 
@@ -261,7 +276,8 @@ const ITER: () = {
 
     #[derive(Clone)]
     pub struct Iter<T: 'static> {
-        node: Option<&'static Node<T>>,
+        node: Option<&'static Node>,
+        marker: PhantomData<T>,
     }
 
     impl<T: 'static> Iterator for Iter<T> {
@@ -269,9 +285,11 @@ const ITER: () = {
 
         fn next(&mut self) -> Option<Self::Item> {
             let node = self.node?;
-            let value = &node.value;
-            self.node = node.next;
-            Some(value)
+            unsafe {
+                let value_ptr = node.value as *const dyn ErasedNode as *const T;
+                self.node = *node.next.get();
+                Some(&*value_ptr)
+            }
         }
     }
 };
@@ -310,8 +328,8 @@ macro_rules! collect {
     ($ty:ty) => {
         impl $crate::Collect for $ty {
             #[inline]
-            fn registry() -> &'static $crate::Registry<Self> {
-                static REGISTRY: $crate::Registry<$ty> = $crate::Registry::new();
+            fn registry() -> &'static $crate::Registry {
+                static REGISTRY: $crate::Registry = $crate::Registry::new();
                 &REGISTRY
             }
         }
@@ -337,7 +355,7 @@ macro_rules! collect {
 /// # struct Flag;
 /// #
 /// # impl Flag {
-/// #     fn new(short: char, name: &'static str) -> Self {
+/// #     const fn new(short: char, name: &'static str) -> Self {
 /// #         Flag
 /// #     }
 /// # }
@@ -374,27 +392,11 @@ macro_rules! submit {
             #[allow(non_upper_case_globals)]
             #[$crate::ctor]
             fn __init() {
-                // TODO: once existential type is stable, store the caller's
-                // expression into a static and string those statics together
-                // into an intrusive linked list without needing allocation.
-                //
-                //     existential type This;
-                //
-                //     static mut VALUE: Option<inventory::Node<This>> = None;
-                //
-                //     fn value() -> This {
-                //         $($value)*
-                //     }
-                //
-                //     unsafe {
-                //         VALUE = Some(inventory::Node {
-                //             value: value(),
-                //             next: None,
-                //         });
-                //         inventory::submit(VALUE.as_mut().unwrap());
-                //     }
-
-                $crate::submit({ $($value)* });
+                static __INVENTORY: $crate::Node = $crate::Node {
+                    value: &{ $($value)* },
+                    next: $crate::core::cell::UnsafeCell::new($crate::core::option::Option::None),
+                };
+                unsafe { $crate::ErasedNode::submit(__INVENTORY.value, &__INVENTORY) }
             }
         };
     }

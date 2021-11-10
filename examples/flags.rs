@@ -4,7 +4,7 @@ struct Flag {
 }
 
 impl Flag {
-    fn new(short: char, name: &'static str) -> Self {
+    const fn new(short: char, name: &'static str) -> Self {
         Flag { short, name }
     }
 }
