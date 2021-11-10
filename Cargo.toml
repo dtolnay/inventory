@@ -1,6 +1,6 @@
 [package]
 name = "inventory"
-version = "0.1.11" # remember to update html_root_url
+version = "0.2.0" # remember to update html_root_url
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Typed distributed plugin registration"
