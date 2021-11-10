@@ -1,9 +1,6 @@
 extern crate proc_macro;
 
-use std::collections::hash_map;
-use std::hash::Hasher;
-
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{bracketed, parse_macro_input, Path, Token};
@@ -42,45 +39,40 @@ pub fn submit(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as Input);
 
     let expr = input.expr;
-    let init = Ident::new(&format!("__init{}", hash(&expr)), Span::call_site());
     let prefix = match input.krate {
         Some(krate) => quote!(#krate::),
         None => quote!(),
     };
 
     let expanded = quote! {
-        #[allow(non_upper_case_globals)]
-        #[#prefix inventory::ctor]
-        fn #init() {
-            // TODO: once existential type is stable, store the caller's
-            // expression into a static and string those statics together into
-            // an intrusive linked list without needing allocation.
-            //
-            //     existential type This;
-            //
-            //     static mut VALUE: Option<inventory::Node<This>> = None;
-            //
-            //     fn value() -> This {
-            //         #expr
-            //     }
-            //
-            //     unsafe {
-            //         VALUE = Some(inventory::Node {
-            //             value: value(),
-            //             next: None,
-            //         });
-            //         inventory::submit(VALUE.as_mut().unwrap());
-            //     }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            #[#prefix inventory::ctor]
+            fn __init() {
+                // TODO: once existential type is stable, store the caller's
+                // expression into a static and string those statics together
+                // into an intrusive linked list without needing allocation.
+                //
+                //     existential type This;
+                //
+                //     static mut VALUE: Option<inventory::Node<This>> = None;
+                //
+                //     fn value() -> This {
+                //         #expr
+                //     }
+                //
+                //     unsafe {
+                //         VALUE = Some(inventory::Node {
+                //             value: value(),
+                //             next: None,
+                //         });
+                //         inventory::submit(VALUE.as_mut().unwrap());
+                //     }
 
-            #prefix inventory::submit({ #expr });
-        }
+                #prefix inventory::submit({ #expr });
+            }
+        };
     };
 
     proc_macro::TokenStream::from(expanded)
-}
-
-fn hash(input: &TokenStream) -> u64 {
-    let mut hasher = hash_map::DefaultHasher::new();
-    hasher.write(input.to_string().as_bytes());
-    hasher.finish()
 }
