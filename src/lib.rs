@@ -103,7 +103,7 @@
 //! visited by the iterator. They may be visited in any order.
 
 #![doc(html_root_url = "https://docs.rs/inventory/0.1.11")]
-#![cfg_attr(not(inventory_require_std), no_std)]
+#![no_std]
 #![allow(
     clippy::doc_markdown,
     clippy::empty_enum,
@@ -113,10 +113,7 @@
     clippy::semicolon_if_nothing_returned, // https://github.com/rust-lang/rust-clippy/issues/7324
 )]
 
-#[cfg(not(inventory_require_std))]
 extern crate alloc;
-#[cfg(not(inventory_require_std))]
-use alloc::boxed::Box;
 
 // Not public API.
 #[doc(hidden)]
@@ -126,6 +123,7 @@ pub use ctor::ctor;
 #[doc(hidden)]
 pub use inventory_impl as r#impl;
 
+use alloc::boxed::Box;
 use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
