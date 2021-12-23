@@ -187,13 +187,13 @@ impl Registry {
     // SAFETY: requires type of *new.value matches the $ty surrounding the
     // declaration of this registry in inventory::collect macro.
     unsafe fn submit(&'static self, new: &'static Node) {
-        let mut head = self.head.load(Ordering::SeqCst);
+        let mut head = self.head.load(Ordering::Relaxed);
         loop {
             *new.next.get() = head.as_ref();
             let new_ptr = new as *const Node as *mut Node;
             match self
                 .head
-                .compare_exchange(head, new_ptr, Ordering::SeqCst, Ordering::SeqCst)
+                .compare_exchange(head, new_ptr, Ordering::Release, Ordering::Relaxed)
             {
                 Ok(_) => return,
                 Err(prev) => head = prev,
@@ -249,7 +249,7 @@ pub use crate::private::*;
 
 const ITER: () = {
     fn into_iter<T: Collect>() -> Iter<T> {
-        let head = T::registry().head.load(Ordering::SeqCst);
+        let head = T::registry().head.load(Ordering::Acquire);
         Iter {
             // Head pointer is always null or valid &'static Node.
             node: unsafe { head.as_ref() },
