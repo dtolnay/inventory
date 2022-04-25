@@ -126,6 +126,7 @@ use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
+use ghost::phantom;
 
 // Not public API. Used by generated code.
 #[doc(hidden)]
@@ -202,14 +203,6 @@ impl Registry {
     }
 }
 
-#[allow(non_camel_case_types)]
-mod private {
-    use ghost::phantom;
-
-    #[phantom]
-    pub struct iter<T>;
-}
-
 /// An iterator over plugins registered of a given type.
 ///
 /// The value `inventory::iter::<T>` is an iterator with element type `&'static
@@ -242,10 +235,8 @@ mod private {
 /// Refer to the [crate level documentation](index.html) for a complete example
 /// of instantiating a plugin registry and submitting plugins.
 #[allow(non_camel_case_types)]
-pub type iter<T> = private::iter<T>;
-
-#[doc(hidden)]
-pub use crate::private::*;
+#[phantom]
+pub struct iter<T>;
 
 const ITER: () = {
     fn into_iter<T: Collect>() -> Iter<T> {
