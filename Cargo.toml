@@ -8,7 +8,7 @@ repository = "https://github.com/dtolnay/inventory"
 documentation = "https://docs.rs/inventory"
 readme = "README.md"
 edition = "2018"
-rust-version = "1.37"
+rust-version = "1.62"
 
 [dependencies]
 ctor = "0.1"
