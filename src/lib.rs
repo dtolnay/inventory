@@ -277,7 +277,7 @@ const ITER: () = {
         fn next(&mut self) -> Option<Self::Item> {
             let node = self.node?;
             unsafe {
-                let value_ptr = node.value as *const dyn ErasedNode as *const T;
+                let value_ptr = (node.value as *const dyn ErasedNode).cast::<T>();
                 self.node = *node.next.get();
                 Some(&*value_ptr)
             }
