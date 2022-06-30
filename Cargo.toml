@@ -7,7 +7,7 @@ description = "Typed distributed plugin registration"
 repository = "https://github.com/dtolnay/inventory"
 documentation = "https://docs.rs/inventory"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 rust-version = "1.62"
 
 [dependencies]
