@@ -11,7 +11,7 @@ need to be a central list of all the plugins.
 
 ```toml
 [dependencies]
-inventory = "0.2"
+inventory = "0.3"
 ```
 
 *Supports rustc 1.62+*
