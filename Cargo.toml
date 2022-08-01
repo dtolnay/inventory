@@ -2,6 +2,7 @@
 name = "inventory"
 version = "0.3.0" # remember to update html_root_url
 authors = ["David Tolnay <dtolnay@gmail.com>"]
+categories = ["development-tools::build-utils", "development-tools::procedural-macro-helpers", "no-std"]
 description = "Typed distributed plugin registration"
 documentation = "https://docs.rs/inventory"
 edition = "2021"
