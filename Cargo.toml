@@ -6,6 +6,7 @@ categories = ["development-tools::build-utils", "development-tools::procedural-m
 description = "Typed distributed plugin registration"
 documentation = "https://docs.rs/inventory"
 edition = "2021"
+keywords = ["linkage"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/dtolnay/inventory"
