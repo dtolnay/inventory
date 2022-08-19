@@ -4,6 +4,6 @@ error[E0277]: the trait bound `Thing: Collect` is not satisfied
 3 | inventory::submit!(Thing);
   | ^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Collect` is not implemented for `Thing`
   |
-  = note: required because of the requirements on the impl of `ErasedNode` for `Thing`
+  = note: required for `Thing` to implement `ErasedNode`
   = note: required for the cast from `Thing` to the object type `dyn ErasedNode`
   = note: this error originates in the macro `inventory::submit` (in Nightly builds, run with -Z macro-backtrace for more info)
