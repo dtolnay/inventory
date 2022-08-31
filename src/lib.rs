@@ -395,5 +395,5 @@ macro_rules! submit {
 
 #[allow(dead_code)]
 fn unused() {
-    let _ = ITER;
+    _ = ITER;
 }
