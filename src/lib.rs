@@ -40,7 +40,7 @@
 //! }
 //!
 //! impl Flag {
-//!     pub fn new(short: char, name: &'static str) -> Self {
+//!     pub const fn new(short: char, name: &'static str) -> Self {
 //!         Flag { short, name }
 //!     }
 //! }
