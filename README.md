@@ -54,7 +54,7 @@ inventory::collect!(Flag);
 ```
 
 This `collect!` call must be in the same crate that defines the plugin type.
-This macro does not "run" anything so place it outside of any function body.
+This macro does not "run" anything, so place it outside of any function body.
 
 ### Registering plugins
 
@@ -68,15 +68,15 @@ inventory::submit! {
 }
 ```
 
-The `submit!` macro does not "run" anything so place it outside of any function
+The `submit!` macro does not "run" anything, so place it outside of any function
 body. In particular, note that all `submit!` invocations across all source files
 linked into your application all take effect simultaneously. A `submit!`
-invocation is not a statement that needs to be called from `main` in order to
-execute.
+invocation is not a statement that needs to be called from the `main` in order to
+be executed.
 
 ### Iterating over plugins
 
-The value `inventory::iter::<T>` is an iterator with element type `&'static T`
+The value `inventory::iter::<T>` is an iterator with an element type of `&'static T`
 that iterates over all plugins registered of type `T`.
 
 ```rust
