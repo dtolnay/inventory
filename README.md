@@ -3,7 +3,7 @@
 [<img alt="github" src="https://img.shields.io/badge/github-dtolnay/inventory-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/dtolnay/inventory)
 [<img alt="crates.io" src="https://img.shields.io/crates/v/inventory.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/inventory)
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-inventory-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/inventory)
-[<img alt="build status" src="https://img.shields.io/github/workflow/status/dtolnay/inventory/CI/master?style=for-the-badge" height="20">](https://github.com/dtolnay/inventory/actions?query=branch%3Amaster)
+[<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/dtolnay/inventory/ci.yml?branch=master&style=for-the-badge" height="20">](https://github.com/dtolnay/inventory/actions?query=branch%3Amaster)
 
 This crate provides a way to set up a plugin registry into which plugins can be
 registered from any source file linked into your application. There does not
