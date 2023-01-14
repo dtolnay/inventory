@@ -1,8 +1,8 @@
 error[E0277]: `Rc<i32>` cannot be shared between threads safely
- --> tests/ui/non-sync.rs:6:1
+ --> tests/ui/non-sync.rs:6:21
   |
 6 | inventory::collect!(Thing);
-  | ^^^^^^^^^^^^^^^^^^^^^^^^^^ `Rc<i32>` cannot be shared between threads safely
+  |                     ^^^^^ `Rc<i32>` cannot be shared between threads safely
   |
   = help: within `Thing`, the trait `Sync` is not implemented for `Rc<i32>`
 note: required because it appears within the type `Thing`
@@ -15,4 +15,3 @@ note: required by a bound in `Collect`
   |
   | pub trait Collect: Sync + Sized + 'static {
   |                    ^^^^ required by this bound in `Collect`
-  = note: this error originates in the macro `inventory::collect` (in Nightly builds, run with -Z macro-backtrace for more info)
