@@ -7,7 +7,7 @@ inventory::collect!(Thing);
 
 fn clone_all() {
     for thing in inventory::iter::<Thing> {
-        _ = Rc::clone(&thing.0);
+        let _ = Rc::clone(&thing.0);
     }
 }
 
