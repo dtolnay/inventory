@@ -1,6 +1,6 @@
 [package]
 name = "inventory"
-version = "0.3.3" # remember to update html_root_url
+version = "0.3.4" # remember to update html_root_url
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 categories = ["development-tools::build-utils", "development-tools::procedural-macro-helpers", "no-std"]
 description = "Typed distributed plugin registration"
