@@ -376,6 +376,18 @@ macro_rules! collect {
 #[macro_export]
 macro_rules! submit {
     ($($value:tt)*) => {
+        $crate::__do_submit! {
+            { $($value)* }
+            { $($value)* }
+        }
+    };
+}
+
+// Not public API.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __do_submit {
+    (used={ $($used:tt)+ } $($value:tt)*) => {
         #[allow(non_upper_case_globals)]
         const _: () = {
             static __INVENTORY: $crate::Node = $crate::Node {
@@ -394,7 +406,7 @@ macro_rules! submit {
             //
             // Why .CRT$XCU on Windows? https://www.cnblogs.com/sunkang/archive/2011/05/24/2055635.html
             // 'I'=C init, 'C'=C++ init, 'P'=Pre-terminators and 'T'=Terminators
-            #[used]
+            $($used)+
             #[cfg_attr(
                 any(
                     target_os = "linux",
@@ -412,7 +424,21 @@ macro_rules! submit {
             #[cfg_attr(windows, link_section = ".CRT$XCU")]
             static __CTOR: unsafe extern "C" fn() = __ctor;
         };
-    }
+    };
+
+    ({ #![used($($used:tt)+)] $($value:tt)* } { $pound:tt $bang:tt $brackets:tt $($dup:tt)* }) => {
+        $crate::__do_submit! {
+            used={ $pound $brackets }
+            $($value)*
+        }
+    };
+
+    ({ $($value:tt)* } { $($dup:tt)* }) => {
+        $crate::__do_submit! {
+            used={ #[used] }
+            $($value)*
+        }
+    };
 }
 
 #[allow(dead_code)]

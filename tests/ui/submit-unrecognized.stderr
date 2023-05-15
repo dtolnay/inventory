@@ -6,4 +6,4 @@ error[E0277]: the trait bound `Thing: Collect` is not satisfied
   |
   = note: required for `Thing` to implement `ErasedNode`
   = note: required for the cast from `&Thing` to `&'static (dyn ErasedNode + 'static)`
-  = note: this error originates in the macro `inventory::submit` (in Nightly builds, run with -Z macro-backtrace for more info)
+  = note: this error originates in the macro `$crate::__do_submit` which comes from the expansion of the macro `inventory::submit` (in Nightly builds, run with -Z macro-backtrace for more info)
