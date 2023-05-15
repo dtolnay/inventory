@@ -12,7 +12,6 @@ repository = "https://github.com/dtolnay/inventory"
 rust-version = "1.62"
 
 [dependencies]
-ctor = "0.2"
 ghost = "0.1.4"
 
 [dev-dependencies]
