@@ -118,10 +118,6 @@
 #[doc(hidden)]
 pub extern crate core;
 
-// Not public API.
-#[doc(hidden)]
-pub use ctor::ctor;
-
 use core::cell::UnsafeCell;
 use core::marker::PhantomData;
 use core::ops::Deref;
@@ -380,16 +376,41 @@ macro_rules! collect {
 #[macro_export]
 macro_rules! submit {
     ($($value:tt)*) => {
+        #[allow(non_upper_case_globals)]
         const _: () = {
-            #[allow(non_upper_case_globals)]
-            #[$crate::ctor]
-            fn __init() {
-                static __INVENTORY: $crate::Node = $crate::Node {
-                    value: &{ $($value)* },
-                    next: $crate::core::cell::UnsafeCell::new($crate::core::option::Option::None),
-                };
+            static __INVENTORY: $crate::Node = $crate::Node {
+                value: &{ $($value)* },
+                next: $crate::core::cell::UnsafeCell::new($crate::core::option::Option::None),
+            };
+
+            #[cfg_attr(any(target_os = "linux", target_os = "android"), link_section = ".text.startup")]
+            unsafe extern "C" fn __ctor() {
                 unsafe { $crate::ErasedNode::submit(__INVENTORY.value, &__INVENTORY) }
             }
+
+            // Linux/ELF: https://www.exploit-db.com/papers/13234
+            //
+            // macOS: https://blog.timac.org/2016/0716-constructor-and-destructor-attributes/
+            //
+            // Why .CRT$XCU on Windows? https://www.cnblogs.com/sunkang/archive/2011/05/24/2055635.html
+            // 'I'=C init, 'C'=C++ init, 'P'=Pre-terminators and 'T'=Terminators
+            #[used]
+            #[cfg_attr(
+                any(
+                    target_os = "linux",
+                    target_os = "android",
+                    target_os = "dragonfly",
+                    target_os = "freebsd",
+                    target_os = "haiku",
+                    target_os = "illumos",
+                    target_os = "netbsd",
+                    target_os = "openbsd",
+                ),
+                link_section = ".init_array",
+            )]
+            #[cfg_attr(any(target_os = "macos", target_os = "ios"), link_section = "__DATA,__mod_init_func")]
+            #[cfg_attr(windows, link_section = ".CRT$XCU")]
+            static __CTOR: unsafe extern "C" fn() = __ctor;
         };
     }
 }

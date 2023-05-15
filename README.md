@@ -92,19 +92,19 @@ by the iterator. They may be visited in any order.
 
 ## How it works
 
-Inventory is built on the [`ctor`] crate which provides module initialization
-functions for Rust similar to `__attribute__((constructor))` in C. Each call to
-`inventory::submit!` produces a shim that evaluates the given expression and
-registers it into a registry of its corresponding type. This registration
-happens dynamically as part of life-before-main for statically linked elements.
-Elements brought in by a dynamically loaded library are registered at the time
-that dlopen occurs.
+Inventory is built on runtime initialization functions similar to
+`__attribute__((constructor))` in C, and similar to the [`ctor`] crate. Each
+call to `inventory::submit!` produces a shim that evaluates the given
+expression and registers it into a registry of its corresponding type. This
+registration happens dynamically as part of life-before-main for statically
+linked elements. Elements brought in by a dynamically loaded library are
+registered at the time that dlopen occurs.
 
 [`ctor`]: https://github.com/mmastrac/rust-ctor
 
-Platform support includes Linux, macOS, iOS, FreeBSD, Android, and Windows.
-Other platforms will simply find that no plugins have been registered. Support
-for other targets would need to be added in the `ctor` crate.
+Platform support includes Linux, macOS, iOS, FreeBSD, Android, Windows, and a
+few others. Beyond this, other platforms will simply find that no plugins have
+been registered.
 
 For a different approach to plugin registration that *does not* involve
 life-before-main, see the [`linkme`] crate.
