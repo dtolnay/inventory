@@ -123,7 +123,6 @@ use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
-use ghost::phantom;
 
 // Not public API. Used by generated code.
 #[doc(hidden)]
@@ -200,40 +199,77 @@ impl Registry {
     }
 }
 
-/// An iterator over plugins registered of a given type.
-///
-/// The value `inventory::iter::<T>` is an iterator with element type `&'static
-/// T`.
-///
-/// There is no guarantee about the order that plugins of the same type are
-/// visited by the iterator. They may be visited in any order.
-///
-/// # Examples
-///
-/// ```
-/// # struct Flag {
-/// #     short: char,
-/// #     name: &'static str,
-/// # }
-/// #
-/// # inventory::collect!(Flag);
-/// #
-/// # const IGNORE: &str = stringify! {
-/// use my_flags::Flag;
-/// # };
-///
-/// fn main() {
-///     for flag in inventory::iter::<Flag> {
-///         println!("-{}, --{}", flag.short, flag.name);
-///     }
-/// }
-/// ```
-///
-/// Refer to the [crate level documentation](index.html) for a complete example
-/// of instantiating a plugin registry and submitting plugins.
-#[allow(non_camel_case_types)]
-#[phantom]
-pub struct iter<T>;
+macro_rules! document_iter {
+    ($iter:item) => {
+        /// An iterator over plugins registered of a given type.
+        ///
+        /// The value `inventory::iter::<T>` is an iterator with element type `&'static
+        /// T`.
+        ///
+        /// There is no guarantee about the order that plugins of the same type are
+        /// visited by the iterator. They may be visited in any order.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # struct Flag {
+        /// #     short: char,
+        /// #     name: &'static str,
+        /// # }
+        /// #
+        /// # inventory::collect!(Flag);
+        /// #
+        /// # const IGNORE: &str = stringify! {
+        /// use my_flags::Flag;
+        /// # };
+        ///
+        /// fn main() {
+        ///     for flag in inventory::iter::<Flag> {
+        ///         println!("-{}, --{}", flag.short, flag.name);
+        ///     }
+        /// }
+        /// ```
+        ///
+        /// Refer to the [crate level documentation](index.html) for a complete example
+        /// of instantiating a plugin registry and submitting plugins.
+        $iter
+    };
+}
+
+#[cfg(doc)]
+document_iter! {
+    #[allow(non_camel_case_types)]
+    pub struct iter<T>;
+}
+
+#[cfg(not(doc))]
+mod void_iter {
+    enum Void {}
+
+    pub struct Iter<T>([*const T; 0], Void);
+
+    unsafe impl<T> Send for Iter<T> {}
+    unsafe impl<T> Sync for Iter<T> {}
+}
+
+#[cfg(not(doc))]
+mod value_iter {
+    pub use crate::iter::iter;
+}
+
+#[cfg(not(doc))]
+document_iter! {
+    // Based on https://github.com/dtolnay/ghost
+    #[allow(non_camel_case_types)]
+    pub enum iter<T> {
+        __Phantom(void_iter::Iter<T>),
+        iter,
+    }
+}
+
+#[cfg(not(doc))]
+#[doc(hidden)]
+pub use crate::value_iter::*;
 
 const ITER: () = {
     fn into_iter<T: Collect>() -> Iter<T> {

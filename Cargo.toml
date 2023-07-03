@@ -11,9 +11,6 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/inventory"
 rust-version = "1.62"
 
-[dependencies]
-ghost = "0.1.4"
-
 [dev-dependencies]
 rustversion = "1.0"
 trybuild = { version = "1.0.66", features = ["diff"] }
