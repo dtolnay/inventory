@@ -246,7 +246,9 @@ document_iter! {
 mod void_iter {
     enum Void {}
 
-    pub struct Iter<T>([*const T; 0], Void);
+    // https://github.com/rust-lang/rust/issues/113941
+    const WORK_AROUND_RUST_ISSUE_113941: usize = 1;
+    pub struct Iter<T>([*const T; WORK_AROUND_RUST_ISSUE_113941], Void);
 
     unsafe impl<T> Send for Iter<T> {}
     unsafe impl<T> Sync for Iter<T> {}
