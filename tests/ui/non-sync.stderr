@@ -5,6 +5,7 @@ error[E0277]: `Rc<i32>` cannot be shared between threads safely
   |                     ^^^^^ `Rc<i32>` cannot be shared between threads safely
   |
   = help: within `Thing`, the trait `Sync` is not implemented for `Rc<i32>`
+  = note: use `std::sync::Arc` instead of `std::rc::Rc`
 note: required because it appears within the type `Thing`
  --> tests/ui/non-sync.rs:4:8
   |
