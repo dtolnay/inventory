@@ -246,6 +246,7 @@ document_iter! {
 mod void_iter {
     enum Void {}
 
+    #[repr(C, packed)]
     pub struct Iter<T>([*const T; 0], Void);
 
     unsafe impl<T> Send for Iter<T> {}
