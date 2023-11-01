@@ -236,13 +236,6 @@ macro_rules! document_iter {
     };
 }
 
-#[cfg(doc)]
-document_iter! {
-    #[allow(non_camel_case_types)]
-    pub struct iter<T>;
-}
-
-#[cfg(not(doc))]
 mod void_iter {
     enum Void {}
 
@@ -253,12 +246,10 @@ mod void_iter {
     unsafe impl<T> Sync for Iter<T> {}
 }
 
-#[cfg(not(doc))]
 mod value_iter {
     pub use crate::iter::iter;
 }
 
-#[cfg(not(doc))]
 document_iter! {
     // Based on https://github.com/dtolnay/ghost
     #[allow(non_camel_case_types)]
@@ -268,7 +259,6 @@ document_iter! {
     }
 }
 
-#[cfg(not(doc))]
 #[doc(hidden)]
 pub use crate::value_iter::*;
 
