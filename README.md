@@ -111,6 +111,17 @@ life-before-main, see the [`linkme`] crate.
 
 [`linkme`]: https://github.com/dtolnay/linkme
 
+### Unsupported OS support
+
+Some "exotic" platforms might support constructors out of the box, but might not
+be identified as "supported OS". You can still **"try"** to make this works by
+forcing constructors with the following feature `inventory_force_init_array`.
+You will have to define this feature in your own project as Inventory injects
+code with the `submit!` macro, forcing you to declare the feature yourself.
+
+You can do the same to force the constructors to be defined in the .text.startup
+section by using `inventory_force_text_startup`.
+
 <br>
 
 #### License

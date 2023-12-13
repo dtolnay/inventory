@@ -423,7 +423,14 @@ macro_rules! __do_submit {
                 next: $crate::core::cell::UnsafeCell::new($crate::core::option::Option::None),
             };
 
-            #[cfg_attr(any(target_os = "linux", target_os = "android"), link_section = ".text.startup")]
+            #[cfg_attr(
+                any(
+                    target_os = "linux",
+                    target_os = "android",
+                    feature = "inventory_force_text_startup",
+                ),
+                link_section = ".text.startup"
+            )]
             unsafe extern "C" fn __ctor() {
                 unsafe { $crate::ErasedNode::submit(__INVENTORY.value, &__INVENTORY) }
             }
@@ -445,6 +452,7 @@ macro_rules! __do_submit {
                     target_os = "illumos",
                     target_os = "netbsd",
                     target_os = "openbsd",
+                    feature = "inventory_force_init_array",
                 ),
                 link_section = ".init_array",
             )]
