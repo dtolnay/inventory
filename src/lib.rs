@@ -104,6 +104,7 @@
 
 #![doc(html_root_url = "https://docs.rs/inventory/0.3.13")]
 #![no_std]
+#![deny(unsafe_op_in_unsafe_fn)]
 #![allow(
     clippy::doc_markdown,
     clippy::empty_enum,
