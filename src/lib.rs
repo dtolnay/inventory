@@ -104,6 +104,7 @@
 
 #![doc(html_root_url = "https://docs.rs/inventory/0.3.13")]
 #![no_std]
+#![deny(unsafe_op_in_unsafe_fn)]
 #![allow(
     clippy::doc_markdown,
     clippy::empty_enum,
@@ -150,7 +151,9 @@ pub trait ErasedNode: Sync {
 
 impl<T: Collect> ErasedNode for T {
     unsafe fn submit(&self, node: &'static Node) {
-        T::registry().submit(node);
+        unsafe {
+            T::registry().submit(node);
+        }
     }
 }
 
@@ -186,7 +189,9 @@ impl Registry {
     unsafe fn submit(&'static self, new: &'static Node) {
         let mut head = self.head.load(Ordering::Relaxed);
         loop {
-            *new.next.get() = head.as_ref();
+            unsafe {
+                *new.next.get() = head.as_ref();
+            }
             let new_ptr = new as *const Node as *mut Node;
             match self
                 .head
