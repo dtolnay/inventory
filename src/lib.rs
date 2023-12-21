@@ -268,7 +268,7 @@ mod private {
 #[doc(hidden)]
 pub use crate::private::*;
 
-const ITER: () = {
+const _: () = {
     fn into_iter<T: Collect>() -> Iter<T> {
         let head = T::registry().head.load(Ordering::Acquire);
         Iter {
@@ -472,9 +472,4 @@ macro_rules! __do_submit {
             $($value)*
         }
     };
-}
-
-#[allow(dead_code)]
-fn unused() {
-    let () = ITER;
 }
