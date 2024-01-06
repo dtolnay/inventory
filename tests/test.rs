@@ -1,6 +1,6 @@
 use std::mem;
 
-struct Thing(usize);
+pub struct Thing(pub usize);
 
 #[test]
 fn test_iter() {
