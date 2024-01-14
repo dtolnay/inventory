@@ -13,7 +13,7 @@ rust-version = "1.62"
 
 [dev-dependencies]
 rustversion = "1.0"
-trybuild = { version = "1.0.66", features = ["diff"] }
+trybuild = { version = "1.0.89", features = ["diff"] }
 
 [lib]
 doc-scrape-examples = false
