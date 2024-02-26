@@ -11,7 +11,7 @@ edition = "2018"
 rust-version = "1.31"
 
 [dependencies]
-ctor = { git = "https://github.com/ErikEverson/rust-ctor.git", rev = "7d5922f89550d14e5148736636d776124fe2f51c" }
+ctor = "0.2.7"
 ghost = "0.1.1"
 inventory-impl = { version = "=0.1.11", path = "impl" }
 
