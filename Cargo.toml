@@ -11,6 +11,9 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/inventory"
 rust-version = "1.62"
 
+[target.'cfg(any(target_os = "emscripten", target_os = "wasi"))'.dependencies]
+rustversion = "1.0"
+
 [dev-dependencies]
 rustversion = "1.0"
 trybuild = { version = "1.0.89", features = ["diff"] }

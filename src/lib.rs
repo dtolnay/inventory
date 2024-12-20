@@ -418,6 +418,14 @@ macro_rules! submit {
 }
 
 // Not public API.
+#[cfg(any(target_os = "emscripten", target_os = "wasi"))]
+#[doc(hidden)]
+pub mod __private {
+    #[doc(hidden)]
+    pub use rustversion::attr;
+}
+
+// Not public API.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __do_submit {
@@ -451,11 +459,16 @@ macro_rules! __do_submit {
                     target_os = "illumos",
                     target_os = "netbsd",
                     target_os = "openbsd",
-                    target_os = "emscripten",
-                    target_os = "wasi",
                     target_os = "none",
                 ),
                 link_section = ".init_array",
+            )]
+            #[cfg_attr(
+                any(target_os = "emscripten", target_os = "wasi"),
+                $crate::__private::attr(
+                    any(all(stable, since(1.85)), since(2024-12-18)),
+                    link_section = ".init_array",
+                ),
             )]
             #[cfg_attr(
                 any(target_os = "macos", target_os = "ios"),
