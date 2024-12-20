@@ -451,6 +451,8 @@ macro_rules! __do_submit {
                     target_os = "illumos",
                     target_os = "netbsd",
                     target_os = "openbsd",
+                    target_os = "emscripten",
+                    target_os = "wasi",
                     target_os = "none",
                 ),
                 link_section = ".init_array",
