@@ -1,4 +1,4 @@
-error[E0015]: cannot call non-const fn `Thing::new` in statics
+error[E0015]: cannot call non-const associated function `Thing::new` in statics
   --> tests/ui/submit-nonconst.rs:11:20
    |
 11 | inventory::submit!(Thing::new());
