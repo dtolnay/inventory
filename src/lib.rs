@@ -418,7 +418,7 @@ macro_rules! submit {
 }
 
 // Not public API.
-#[cfg(any(target_os = "emscripten", target_os = "wasi"))]
+#[cfg(target_family = "wasm")]
 #[doc(hidden)]
 pub mod __private {
     #[doc(hidden)]
@@ -450,21 +450,24 @@ macro_rules! __do_submit {
             // 'I'=C init, 'C'=C++ init, 'P'=Pre-terminators and 'T'=Terminators
             $($used)+
             #[cfg_attr(
-                any(
-                    target_os = "linux",
-                    target_os = "android",
-                    target_os = "dragonfly",
-                    target_os = "freebsd",
-                    target_os = "haiku",
-                    target_os = "illumos",
-                    target_os = "netbsd",
-                    target_os = "openbsd",
-                    target_os = "none",
+                all(
+                    not(target_family = "wasm"),
+                    any(
+                        target_os = "linux",
+                        target_os = "android",
+                        target_os = "dragonfly",
+                        target_os = "freebsd",
+                        target_os = "haiku",
+                        target_os = "illumos",
+                        target_os = "netbsd",
+                        target_os = "openbsd",
+                        target_os = "none",
+                    )
                 ),
                 link_section = ".init_array",
             )]
             #[cfg_attr(
-                any(target_os = "emscripten", target_os = "wasi"),
+                target_family = "wasm",
                 $crate::__private::attr(
                     any(all(stable, since(1.85)), since(2024-12-18)),
                     link_section = ".init_array",
