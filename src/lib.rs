@@ -106,8 +106,8 @@
 //!
 //! `inventory` supports all WebAssembly targets, including
 //! `wasm*-unknown-unknown`. However, in unusual circumstances, ensuring that
-//! constructors run may require some extra effort. The WASM linker will
-//! generate a function `extern "C" unsafe fn __wasm_call_ctors()` which calls
+//! constructors run may require some extra effort. The Wasm linker will
+//! synthesize a function `extern "C" unsafe fn __wasm_call_ctors()` which calls
 //! all constructors when invoked; this function will *not* be exported from the
 //! module unless you do so explicitly. Depending on the result of a heuristic,
 //! the linker may or may not insert a call to this function from the beginning
@@ -123,7 +123,7 @@
 //! only once per instantiation. Violation of this expectation can result in
 //! `__wasm_call_ctors` being called multiple times. This is dangerous in
 //! general, but safe and mostly harmless in the case of constructors generated
-//! by `inventory`, which ensure their own idempotence.
+//! by `inventory`, which are idempotent.
 //!
 //! If you are building a module which relies on constructors and may be called
 //! into multiple times per instance, you should export `__wasm_call_ctors` (or
@@ -155,6 +155,8 @@ use core::cell::UnsafeCell;
 use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ptr;
+#[cfg(target_family = "wasm")]
+use core::sync::atomic::AtomicBool;
 use core::sync::atomic::{AtomicPtr, Ordering};
 
 // Not public API. Used by generated code.
@@ -169,7 +171,7 @@ pub struct Node {
     pub value: &'static dyn ErasedNode,
     pub next: UnsafeCell<Option<&'static Node>>,
     #[cfg(target_family = "wasm")]
-    pub initialized: core::sync::atomic::AtomicBool,
+    pub initialized: AtomicBool,
 }
 
 // The `value` is Sync, and `next` is only mutated during submit, which is prior
@@ -221,14 +223,14 @@ impl Registry {
     // SAFETY: requires type of *new.value matches the $ty surrounding the
     // declaration of this registry in inventory::collect macro.
     unsafe fn submit(&'static self, new: &'static Node) {
-        // The WASM linker uses an unreliable heuristic to determine whether a
-        // module is a "command-style" linkage, for which it will insert a call
-        // to  `__wasm_call_ctors` at the top of every exported function. It
-        // expects that the embedder will call into such modules only once per
-        // instantiation. If this heuristic goes wrong, we can end up having our
-        // constructors invoked multiple times, which without this safeguard
-        // would lead to our registry's linked list becoming circular. On
-        // non-WASM platforms, this check is unnecessary, so we skip it.
+        // The WebAssembly linker uses an unreliable heuristic to determine
+        // whether a module is a "command-style" linkage, for which it will
+        // insert a call to  `__wasm_call_ctors` at the top of every exported
+        // function. It expects that the embedder will call into such modules
+        // only once per instantiation. If this heuristic goes wrong, we can end
+        // up having our constructors invoked multiple times, which without this
+        // safeguard would lead to our registry's linked list becoming circular.
+        // On non-Wasm platforms, this check is unnecessary, so we skip it.
         #[cfg(target_family = "wasm")]
         if new.initialized.swap(true, Ordering::Relaxed) {
             return;
