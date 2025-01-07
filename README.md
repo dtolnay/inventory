@@ -102,9 +102,9 @@ registered at the time that dlopen occurs.
 
 [`ctor`]: https://github.com/mmastrac/rust-ctor
 
-Platform support includes Linux, macOS, iOS, FreeBSD, Android, Windows, and a
-few others. Beyond this, other platforms will simply find that no plugins have
-been registered.
+Platform support includes Linux, macOS, iOS, FreeBSD, Android, Windows,
+WebAssembly, and a few others. Beyond this, other platforms will simply find
+that no plugins have been registered.
 
 For a different approach to plugin registration that *does not* involve
 life-before-main, see the [`linkme`] crate.
