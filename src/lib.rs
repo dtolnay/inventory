@@ -137,6 +137,8 @@ pub struct Registry {
 pub struct Node {
     pub value: &'static dyn ErasedNode,
     pub next: UnsafeCell<Option<&'static Node>>,
+    #[cfg(target_family = "wasm")]
+    pub initialized: core::sync::atomic::AtomicBool,
 }
 
 // The `value` is Sync, and `next` is only mutated during submit, which is prior
@@ -188,6 +190,19 @@ impl Registry {
     // SAFETY: requires type of *new.value matches the $ty surrounding the
     // declaration of this registry in inventory::collect macro.
     unsafe fn submit(&'static self, new: &'static Node) {
+        // The WASM linker uses an unreliable heuristic to determine whether a
+        // module is a "command-style" linkage, for which it will insert a call
+        // to  `__wasm_call_ctors` at the top of every exported function. It
+        // expects that the embedder will call into such modules only once per
+        // instantiation. If this heuristic goes wrong, we can end up having our
+        // constructors invoked multiple times, which without this safeguard
+        // would lead to our registry's linked list becoming circular. On
+        // non-WASM platforms, this check is unnecessary, so we skip it.
+        #[cfg(target_family = "wasm")]
+        if new.initialized.swap(true, Ordering::Relaxed) {
+            return;
+        }
+
         let mut head = self.head.load(Ordering::Relaxed);
         loop {
             unsafe {
@@ -435,6 +450,8 @@ macro_rules! __do_submit {
             static __INVENTORY: $crate::Node = $crate::Node {
                 value: &{ $($value)* },
                 next: $crate::core::cell::UnsafeCell::new($crate::core::option::Option::None),
+                #[cfg(target_family = "wasm")]
+                initialized: $crate::core::sync::atomic::AtomicBool::new(false),
             };
 
             #[cfg_attr(any(target_os = "linux", target_os = "android"), link_section = ".text.startup")]
