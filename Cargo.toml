@@ -1,6 +1,6 @@
 [package]
 name = "inventory"
-version = "0.3.16"
+version = "0.3.17"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 categories = ["development-tools::build-utils", "development-tools::procedural-macro-helpers", "no-std", "no-std::no-alloc"]
 description = "Typed distributed plugin registration"
