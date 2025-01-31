@@ -358,7 +358,6 @@ const _: () = {
         }
     }
 
-    #[derive(Clone)]
     pub struct Iter<T: 'static> {
         node: Option<&'static Node>,
         marker: PhantomData<T>,
@@ -373,6 +372,15 @@ const _: () = {
                 let value_ptr = (node.value as *const dyn ErasedNode).cast::<T>();
                 self.node = *node.next.get();
                 Some(&*value_ptr)
+            }
+        }
+    }
+
+    impl<T> Clone for Iter<T> {
+        fn clone(&self) -> Self {
+            Self {
+                node: self.node,
+                marker: PhantomData,
             }
         }
     }
