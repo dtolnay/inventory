@@ -147,7 +147,7 @@
 //! }
 //! ```
 
-#![doc(html_root_url = "https://docs.rs/inventory/0.3.19")]
+#![doc(html_root_url = "https://docs.rs/inventory/0.3.20")]
 #![no_std]
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(
