@@ -1,16 +1,7 @@
-error[E0658]: `#[used(linker)]` is currently unstable
- --> tests/ui/outer-attr.rs:6:5
-  |
-6 |     #[used(linker)]
-  |     ^^^^^^^^^^^^^^^
-  |
-  = note: see issue #93798 <https://github.com/rust-lang/rust/issues/93798> for more information
-  = help: add `#![feature(used_with_arg)]` to the crate attributes to enable
-
 error: attribute must be applied to a `static` variable
- --> tests/ui/outer-attr.rs:6:5
+ --> tests/ui/outer-attr.rs:8:5
   |
-6 |     #[used(linker)]
+8 |     #[used(linker)]
   |     ^^^^^^^^^^^^^^^
-7 |     Thing
+9 |     Thing
   |     ----- but this is a expression

@@ -1,3 +1,5 @@
+#![feature(used_with_arg)]
+
 struct Thing;
 
 inventory::collect!(Thing);
