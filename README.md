@@ -113,6 +113,34 @@ life-before-main, see the [`linkme`] crate.
 
 <br>
 
+### Illumos Compatibility
+
+This crate requires Rust nightly when compiling for illumos targets due to its
+dependency on the unstable `used_with_arg` feature.
+
+To use this crate on illumos, you must enable the required feature in all 
+crates that use `inventory`. Add one of the following to the top of your crate's
+entry point (typically `main.rs` or `lib.rs`):
+
+**For illumos-only applications:**
+```rust
+#![feature(used_with_arg)]
+```
+
+**For cross-platform applications:**
+```rust
+#[cfg_attr(target_os = "illumos", feature(used_with_arg))]
+```
+
+The conditional approach allows your application to compile on stable Rust for
+other platforms while only requiring nightly on illumos.
+
+This is because the illumos linker does not properly handle the multiple
+`.init_array` sections created when using `#[used]`. You can find more
+information [here](https://system-illumination.org/01-rustler.html).
+
+<br>
+
 #### License
 
 <sup>

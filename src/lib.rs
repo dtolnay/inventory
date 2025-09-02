@@ -563,7 +563,8 @@ macro_rules! __do_submit {
 
     ({ $($value:tt)* } { $($dup:tt)* }) => {
         $crate::__do_submit! {
-            used={ #[used] }
+            used={ #[cfg_attr(target_os = "illumos", used(compiler))]
+                   #[cfg_attr(not(target_os = "illumos"), used)] }
             $($value)*
         }
     };
