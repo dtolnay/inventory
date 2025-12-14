@@ -255,7 +255,7 @@ impl Registry {
             unsafe {
                 *new.next.get() = head.as_ref();
             }
-            let new_ptr = (new as *const Node).cast_mut();
+            let new_ptr = ptr::addr_of!(*new).cast_mut();
             match self
                 .head
                 .compare_exchange(head, new_ptr, Ordering::Release, Ordering::Relaxed)
@@ -369,7 +369,7 @@ const _: () = {
         fn next(&mut self) -> Option<Self::Item> {
             let node = self.node?;
             unsafe {
-                let value_ptr = (node.value as *const dyn ErasedNode).cast::<T>();
+                let value_ptr = ptr::addr_of!(*node.value).cast::<T>();
                 self.node = *node.next.get();
                 Some(&*value_ptr)
             }
