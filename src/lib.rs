@@ -255,7 +255,7 @@ impl Registry {
             unsafe {
                 *new.next.get() = head.as_ref();
             }
-            let new_ptr = new as *const Node as *mut Node;
+            let new_ptr = (new as *const Node).cast_mut();
             match self
                 .head
                 .compare_exchange(head, new_ptr, Ordering::Release, Ordering::Relaxed)
