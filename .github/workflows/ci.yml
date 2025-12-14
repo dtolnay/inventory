@@ -59,14 +59,14 @@ jobs:
         continue-on-error: true
 
   msrv:
-    name: Rust 1.65.0
+    name: Rust 1.68.0
     needs: pre_ci
     if: needs.pre_ci.outputs.continue
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@1.65.0
+      - uses: dtolnay/rust-toolchain@1.68.0
       - run: cargo check
 
   doc:
