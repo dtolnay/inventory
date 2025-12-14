@@ -9,7 +9,7 @@ edition = "2021"
 keywords = ["linkage"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/inventory"
-rust-version = "1.62"
+rust-version = "1.65"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 rustversion = "1.0"
