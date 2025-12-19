@@ -51,7 +51,7 @@ jobs:
         if: matrix.rust == 'nightly-x86_64-pc-windows-gnu'
         shell: bash
       - run: cargo test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: matrix.os == 'ubuntu' && matrix.rust == 'nightly' && always()
         with:
           name: Cargo.lock
