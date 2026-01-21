@@ -1,4 +1,4 @@
-error[E0277]: the trait bound `Thing: ErasedNode` is not satisfied
+error[E0277]: the trait bound `Thing: inventory::ErasedNode` is not satisfied
  --> tests/ui/submit-unrecognized.rs:3:1
   |
 3 | inventory::submit!(Thing);
@@ -9,6 +9,6 @@ help: the trait `Collect` is not implemented for `Thing`
   |
 1 | pub struct Thing;
   | ^^^^^^^^^^^^^^^^
-  = note: required for `Thing` to implement `ErasedNode`
-  = note: required for the cast from `&Thing` to `&'static (dyn ErasedNode + 'static)`
+  = note: required for `Thing` to implement `inventory::ErasedNode`
+  = note: required for the cast from `&Thing` to `&'static (dyn inventory::ErasedNode + 'static)`
   = note: this error originates in the macro `$crate::__do_submit` which comes from the expansion of the macro `inventory::submit` (in Nightly builds, run with -Z macro-backtrace for more info)
