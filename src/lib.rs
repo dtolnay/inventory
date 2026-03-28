@@ -165,13 +165,14 @@
 #[doc(hidden)]
 pub extern crate core;
 
-use core::cell::UnsafeCell;
 use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ptr;
-#[cfg(target_family = "wasm")]
-use core::sync::atomic::AtomicBool;
 use core::sync::atomic::{AtomicPtr, Ordering};
+
+pub type UnsafeCell<T> = core::cell::UnsafeCell<T>;
+#[cfg(target_family = "wasm")]
+pub type AtomicBool = core::sync::atomic::AtomicBool;
 
 // Not public API. Used by generated code.
 #[doc(hidden)]
@@ -504,9 +505,9 @@ macro_rules! __do_submit {
         const _: () = {
             static __INVENTORY: $crate::Node = $crate::Node {
                 value: &{ $($value)* },
-                next: $crate::core::cell::UnsafeCell::new($crate::core::option::Option::None),
+                next: $crate::UnsafeCell::new($crate::core::option::Option::None),
                 #[cfg(target_family = "wasm")]
-                initialized: $crate::core::sync::atomic::AtomicBool::new(false),
+                initialized: $crate::AtomicBool::new(false),
             };
 
             #[cfg_attr(any(target_os = "linux", target_os = "android"), link_section = ".text.startup")]
