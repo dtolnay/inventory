@@ -161,10 +161,6 @@
     clippy::semicolon_if_nothing_returned, // https://github.com/rust-lang/rust-clippy/issues/7324
 )]
 
-// Not public API.
-#[doc(hidden)]
-pub extern crate core;
-
 use core::cell::UnsafeCell;
 use core::marker::PhantomData;
 use core::ops::Deref;
@@ -490,6 +486,9 @@ macro_rules! submit {
 // Not public API.
 #[doc(hidden)]
 pub mod __private {
+    #[doc(hidden)]
+    pub use core::option::Option;
+
     #[cfg(target_family = "wasm")]
     #[doc(hidden)]
     pub use rustversion::attr;
@@ -515,7 +514,7 @@ macro_rules! __do_submit {
         const _: () = {
             static __INVENTORY: $crate::Node = $crate::Node {
                 value: &{ $($value)* },
-                next: $crate::__private::UnsafeCell::new($crate::core::option::Option::None),
+                next: $crate::__private::UnsafeCell::new($crate::__private::Option::None),
                 #[cfg(target_family = "wasm")]
                 initialized: $crate::__private::AtomicBool::new(false),
             };
