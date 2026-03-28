@@ -170,7 +170,12 @@ use core::ops::Deref;
 use core::ptr;
 use core::sync::atomic::{AtomicPtr, Ordering};
 
+// Type alias to sidestep clippy::disallowed_types in downstream projects that
+// use Loom.
 pub type UnsafeCell<T> = core::cell::UnsafeCell<T>;
+
+// Type alias to sidestep clippy::disallowed_types in downstream projects that
+// use Loom.
 #[cfg(target_family = "wasm")]
 pub type AtomicBool = core::sync::atomic::AtomicBool;
 
