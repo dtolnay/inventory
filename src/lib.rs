@@ -165,19 +165,13 @@
 #[doc(hidden)]
 pub extern crate core;
 
+use core::cell::UnsafeCell;
 use core::marker::PhantomData;
 use core::ops::Deref;
 use core::ptr;
-use core::sync::atomic::{AtomicPtr, Ordering};
-
-// Type alias to sidestep clippy::disallowed_types in downstream projects that
-// use Loom.
-pub type UnsafeCell<T> = core::cell::UnsafeCell<T>;
-
-// Type alias to sidestep clippy::disallowed_types in downstream projects that
-// use Loom.
 #[cfg(target_family = "wasm")]
-pub type AtomicBool = core::sync::atomic::AtomicBool;
+use core::sync::atomic::AtomicBool;
+use core::sync::atomic::{AtomicPtr, Ordering};
 
 // Not public API. Used by generated code.
 #[doc(hidden)]
@@ -494,11 +488,22 @@ macro_rules! submit {
 }
 
 // Not public API.
-#[cfg(target_family = "wasm")]
 #[doc(hidden)]
 pub mod __private {
+    #[cfg(target_family = "wasm")]
     #[doc(hidden)]
     pub use rustversion::attr;
+
+    // Type alias to sidestep clippy::disallowed_types in downstream projects
+    // that use Loom.
+    #[doc(hidden)]
+    pub type UnsafeCell<T> = core::cell::UnsafeCell<T>;
+
+    // Type alias to sidestep clippy::disallowed_types in downstream projects
+    // that use Loom.
+    #[cfg(target_family = "wasm")]
+    #[doc(hidden)]
+    pub type AtomicBool = core::sync::atomic::AtomicBool;
 }
 
 // Not public API.
@@ -510,9 +515,9 @@ macro_rules! __do_submit {
         const _: () = {
             static __INVENTORY: $crate::Node = $crate::Node {
                 value: &{ $($value)* },
-                next: $crate::UnsafeCell::new($crate::core::option::Option::None),
+                next: $crate::__private::UnsafeCell::new($crate::core::option::Option::None),
                 #[cfg(target_family = "wasm")]
-                initialized: $crate::AtomicBool::new(false),
+                initialized: $crate::__private::AtomicBool::new(false),
             };
 
             #[cfg_attr(any(target_os = "linux", target_os = "android"), link_section = ".text.startup")]
