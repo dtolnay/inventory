@@ -544,6 +544,7 @@ macro_rules! __do_submit {
                         target_os = "netbsd",
                         target_os = "nto",
                         target_os = "openbsd",
+                        target_os = "vxworks",
                         target_os = "none",
                     )
                 ),
