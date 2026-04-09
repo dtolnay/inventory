@@ -417,6 +417,8 @@ macro_rules! collect {
         impl $crate::Collect for $ty {
             #[inline]
             fn registry() -> &'static $crate::Registry {
+                #[allow(unexpected_cfgs)]
+                #[cfg_attr(asan, sanitize(address = "off"))]
                 static REGISTRY: $crate::Registry = $crate::Registry::new();
                 &REGISTRY
             }
@@ -512,6 +514,8 @@ macro_rules! __do_submit {
     (used={ $($used:tt)+ } $($value:tt)*) => {
         #[allow(non_upper_case_globals)]
         const _: () = {
+            #[allow(unexpected_cfgs)]
+            #[cfg_attr(asan, sanitize(address = "off"))]
             static __INVENTORY: $crate::Node = $crate::Node {
                 value: &{ $($value)* },
                 next: $crate::__private::UnsafeCell::new($crate::__private::Option::None),
