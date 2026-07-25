@@ -1,7 +1,7 @@
-error: `#[used]` attribute cannot be used on expressions
- --> tests/ui/outer-attr.rs:8:5
+error: the `used` attribute cannot be used on expressions
+ --> tests/ui/outer-attr.rs:8:7
   |
 8 |     #[used(linker)]
-  |     ^^^^^^^^^^^^^^^
+  |       ^^^^
   |
-  = help: `#[used]` can only be applied to statics
+  = help: the `used` attribute can only be applied to statics
