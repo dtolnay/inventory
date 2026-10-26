@@ -3,5 +3,6 @@ error: the `used` attribute cannot be used on expressions
   |
 8 |     #[used(linker)]
   |       ^^^^
+9 |     Thing
   |
   = help: the `used` attribute can only be applied to statics
